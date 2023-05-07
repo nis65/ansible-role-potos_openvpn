@@ -57,6 +57,7 @@ targetname="${inputfile%%\.gpg}"
 if /usr/bin/gpg  -d "${inputfile}" 2>/dev/null | sudo install_system_vpn "${targetname}"
 then
   echo "==== ALL OK ===================="
+  sleep 1
   ip a show tun0
   echo "==== ALL OK ===================="
   if [[ "${DELETEGPGDIR}" == "yes" ]]
@@ -64,7 +65,7 @@ then
     echo "removing temporary directory $GPGDIR"
     rm -rf $GPGDIR
   else
-    echo "password is now in $GPDIR"
+    echo "password is now in $GPGDIR"
   fi
 else
   echo "something went wrong"
