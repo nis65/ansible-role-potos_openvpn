@@ -36,7 +36,7 @@ then
 fi
 
 echo -n "."
-systemctl stop penvpn-client@${cleantargetname}
+systemctl stop openvpn-client@${cleantargetname}
 echo -n "."
 systemctl disable openvpn-client@${cleantargetname}
 echo -n "."
