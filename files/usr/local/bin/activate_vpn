@@ -46,7 +46,7 @@ fi
 sudo -K
 
 targetname="${inputfile%%\.gpg}"
-if /usr/bin/gpg  -d "${inputfile}" | sudo install_system_vpn "${targetname}"
+if /usr/bin/gpg  -d "${inputfile}" 2>/dev/null | sudo install_system_vpn "${targetname}"
 then
   echo "==== ALL OK ===================="
   ip a show tun0
