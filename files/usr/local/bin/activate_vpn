@@ -63,7 +63,12 @@ then
   if [[ "${DELETEGPGDIR}" == "yes" ]]
   then
     echo "removing temporary directory $GPGDIR"
-    rm -rf $GPGDIR
+    while [[ -e "${GPGDIR}" ]]
+    do
+      rm -rf $GPGDIR
+      echo -n "."
+      sleep "0.2"
+    done
   else
     echo "password is now in $GPGDIR"
   fi
