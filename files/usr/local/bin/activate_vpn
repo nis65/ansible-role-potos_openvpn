@@ -43,7 +43,7 @@ else
 fi
 
 GPGDIR=~/.gnupg
-if [[ -e $GPGDIR ]]
+if [[ -e "${GPGDIR}" ]]
 then
   DELETEGPGDIR=no
 else
