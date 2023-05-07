@@ -1,7 +1,4 @@
 ---
 
-# Example variable
-potos_template_example_var: 'hello world!'
-
-# List of items used for action xyz
-potos_template_example_list: []
+# Install vpn user handover scripts?
+potos_openvpn_install_user_handover: true

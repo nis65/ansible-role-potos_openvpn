@@ -1,9 +1,23 @@
 ---
 
-- name: Example task to deploy a template
-  ansible.builtin.template:
-    src: 'potos.example.j2'
-    dest: '/potos.example'
-    owner: root
-    group: root
-    mode: '0755'
+- name: Ensure openvpn including network manager modules is installed
+  ansible.builtin.apt:
+    name: 'network-manager-openvpn-gnome'
+    state: present
+
+- name: install vpn conf handover scripts
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: usr/local/bin/activate_vpn
+      dest: /usr/local/bin/activate_vpn
+      mode: 755
+    - src: etc/sudoers.d/potos_openvpn_handover
+      dest: /etc/sudoers.d/potos_openvpn_handover
+      mode: 640
+    - src: usr/local/bin/install_system_vpn
+      dest: /usr/local/bin/install_system_vpn
+      mode: 755
+  when: potos_openvpn_install_user_handover
