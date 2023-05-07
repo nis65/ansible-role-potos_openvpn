@@ -9,7 +9,7 @@
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    mode: "{{ item. mode }}"
+    mode: "{{ item.mode }}"
   loop:
     - src: usr/local/bin/activate_vpn
       dest: /usr/local/bin/activate_vpn
