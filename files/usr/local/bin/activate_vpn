@@ -42,5 +42,15 @@ else
   usage "Filename must end in .gpg and file must be readable (${inputfile})"
 fi
 
+# remove cached sudo passwords
+sudo -K
+
 targetname="${inputfile%%\.gpg}"
-/usr/bin/gpg  -d "${inputfile}" | sudo install_system_vpn "${targetname}"
+if /usr/bin/gpg  -d "${inputfile}" | sudo install_system_vpn "${targetname}"
+then
+  echo "==== ALL OK ===================="
+  ip a show tun0
+  echo "==== ALL OK ===================="
+else
+  echo "something went wrong"
+fi

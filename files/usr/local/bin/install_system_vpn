@@ -35,7 +35,16 @@ then
   exit 1
 fi
 
+echo -n "."
+systemctl stop penvpn-client@${cleantargetname}
+echo -n "."
+systemctl disable openvpn-client@${cleantargetname}
+echo -n "."
 cat > /etc/openvpn/client/${cleantargetname}.conf
-
+echo -n "."
+systemctl daemon-reload
+echo -n "."
 systemctl enable openvpn-client@${cleantargetname}
+echo -n "."
 systemctl start openvpn-client@${cleantargetname}
+echo -n ":"
