@@ -42,15 +42,30 @@ else
   usage "Filename must end in .gpg and file must be readable (${inputfile})"
 fi
 
+# cleanup .gnupg directory at the end if appropriate
+GPGDIR=~/.gnupg
+if [[ -e "${GPGDIR}" ]]
+then
+  DELETEGPGDIR=no
+else
+  DELETEGPGDIR=yes
+fi
+
 # remove cached sudo passwords
 sudo -K
-
 targetname="${inputfile%%\.gpg}"
 if /usr/bin/gpg  -d "${inputfile}" 2>/dev/null | sudo install_system_vpn "${targetname}"
 then
   echo "==== ALL OK ===================="
   ip a show tun0
   echo "==== ALL OK ===================="
+  if [[ "${DELETEGPGDIR}" == "yes" ]]
+  then
+    echo "removing temporary directory $GPGDIR"
+    rm -rf $GPGDIR
+  else
+    echo "password is now in $GPDIR"
+  fi
 else
   echo "something went wrong"
 fi
