@@ -42,6 +42,14 @@ else
   usage "Filename must end in .gpg and file must be readable (${inputfile})"
 fi
 
+GPGDIR=~/.gnupg
+if [[ -e $GPGDIR ]]
+then
+  DELETEGPGDIR=no
+else
+  DELETEGPGDIR=yes
+fi
+
 # remove cached sudo passwords
 sudo -K
 targetname="${inputfile%%\.gpg}"
@@ -51,6 +59,15 @@ then
   sleep 1
   ip a show tun0
   echo "==== ALL OK ===================="
+  if [[ "${DELETEGPGDIR}" == "yes" ]]
+  then
+    echo "removing temporary directory $GPGDIR"
+    killall gpg-agent
+    sleep 1
+    rm -rf $GPGDIR
+  else
+    echo "password is now in $GPGDIR"
+  fi
 else
   echo "something went wrong"
 fi
