@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# input param: filename
+#
+# This file should be an "gpg -c" encrypted .ovpn client
+# config file.
+
+# The script will make gpg to ask interactively for a
+# decryption password. The plaintext of the file is
+# sent to stdin of the follow up script run via sudo.
+
+usage () {
+
+msg="${1}"
+
+  echo ""
+  echo "Usage"
+  echo ""
+  echo "$0 <filename>"
+  echo ""
+  if [[ -z "${msg}" ]]
+  then
+    echo "<filename> must be a readable, encrypted openvpn config file"
+  else
+    echo "Error: ${msg}"
+  fi
+  echo ""
+  exit 1
+}
+
+inputfile="$1"
+
+if [[ -z "${inputfile}" ]]
+then
+  usage "No input file name"
+fi
+
+if [[ -r "${inputfile}" && "${inputfile}" != "${inputfile%%\.gpg}" ]]
+then
+  echo "${inputfile} is readable and its name ends in .gpg, going on"
+else
+  usage "Filename must end in .gpg and file must be readable (${inputfile})"
+fi
+
+targetname="${inputfile%%\.gpg}"
+/usr/bin/gpg  -d "${inputfile}" | sudo install_system_vpn "${targetname}"
