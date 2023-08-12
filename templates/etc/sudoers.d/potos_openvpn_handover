@@ -1,0 +1,2 @@
+User_Alias INSTALLVPNUSERS = %{{ potos_openvpn_allow_install_groups | join (', %') }}
+INSTALLVPNUSERS     ALL=(root) /usr/local/bin/install_system_vpn *
