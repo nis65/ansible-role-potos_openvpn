@@ -5,6 +5,17 @@
     name: 'network-manager-openvpn-gnome'
     state: present
 
+- name: install vpn conf templates
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: etc/sudoers.d/potos_openvpn_handover
+      dest: /etc/sudoers.d/potos_openvpn_handover
+      mode: 640
+  when: potos_openvpn_install_user_handover
+
 - name: install vpn conf handover scripts
   ansible.builtin.copy:
     src: "{{ item.src }}"
@@ -14,9 +25,6 @@
     - src: usr/local/bin/activate_vpn
       dest: /usr/local/bin/activate_vpn
       mode: 755
-    - src: etc/sudoers.d/potos_openvpn_handover
-      dest: /etc/sudoers.d/potos_openvpn_handover
-      mode: 640
     - src: usr/local/bin/install_system_vpn
       dest: /usr/local/bin/install_system_vpn
       mode: 755
