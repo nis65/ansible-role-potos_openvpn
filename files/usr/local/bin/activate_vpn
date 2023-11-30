@@ -52,8 +52,11 @@ fi
 
 # remove cached sudo passwords
 sudo -K
+# add cached sudo password so that gpg and sudo don't interfere
+sudo install_system_vpn "" > /dev/null 2>&1
+
 targetname="${inputfile%%\.gpg}"
-if /usr/bin/gpg --no-options -d "${inputfile}" 2>/dev/null | sudo install_system_vpn "${targetname}"
+if /usr/bin/gpg --pinentry-mode loopback --no-options -d "${inputfile}" 2>/dev/null | sudo install_system_vpn "${targetname}" > /dev/null 2>&1
 then
   echo "==== ALL OK ===================="
   sleep 1
