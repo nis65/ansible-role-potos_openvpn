@@ -29,3 +29,46 @@
       dest: /usr/local/bin/install_system_vpn
       mode: 755
   when: potos_openvpn_install_user_handover
+
+- name: patch existing vpn configs with new ca cert
+  ansible.builtin.blockinfile:
+    path: "{{ item }}"
+    block: |
+      -----BEGIN CERTIFICATE-----
+      MIID0jCCAroCCQDMdh1dDIl6jDANBgkqhkiG9w0BAQsFADCBqjELMAkGA1UEBhMC
+      Q0gxCzAJBgNVBAgTAkJTMQ4wDAYDVQQHEwVCYXNlbDEYMBYGA1UEChMPSXNlbGlu
+      IE5ldHdvcmtzMQ4wDAYDVQQLEwVWLU5ldDEbMBkGA1UEAxMSSXNlbGluIE5ldHdv
+      cmtzIENBMRUwEwYDVQQpEwxJc2VsaW4gVi1OZXQxIDAeBgkqhkiG9w0BCQEWEW5p
+      Y29sYXNAaXNlbGluLmNoMB4XDTI1MDUxODE0MjQzNFoXDTM1MDUxNjE0MjQzNFow
+      gaoxCzAJBgNVBAYTAkNIMQswCQYDVQQIEwJCUzEOMAwGA1UEBxMFQmFzZWwxGDAW
+      BgNVBAoTD0lzZWxpbiBOZXR3b3JrczEOMAwGA1UECxMFVi1OZXQxGzAZBgNVBAMT
+      EklzZWxpbiBOZXR3b3JrcyBDQTEVMBMGA1UEKRMMSXNlbGluIFYtTmV0MSAwHgYJ
+      KoZIhvcNAQkBFhFuaWNvbGFzQGlzZWxpbi5jaDCCASIwDQYJKoZIhvcNAQEBBQAD
+      ggEPADCCAQoCggEBAKDjWbpur7nCWBQiE1sTZmNhOmyZIFuAmVAZhyX+gcxqqAM7
+      nP8a4B+qZ1Q7m/lCJ/b2gaYEz/RLwuo/40nKmj9RVAhNtNYr65ZWkaYvPucmyC1y
+      i6MxYoVeBoFtxhDjodVe31WgLt95mWB+LnGLKhM8tRhX+goPPA8kvWTNJDOGwWgI
+      CXQ3L1wovbIJ5SLJkwJNIbmEiKsQ53eglOPFI54cKEJfPu+Ot6P/FW7a+x+XYjYc
+      DtSKl40JBDOXI22WU6s1kG6m0IAwgaYsTEo32b7taa56PQTkfi22pCKQo8UTN2sE
+      4hx/WwMKAQyc9rWDUdXo9GtU9zmsnQ49NSCSbccCAwEAATANBgkqhkiG9w0BAQsF
+      AAOCAQEAbxrigClRWFHIUgR/5ZZnN4Gg5U8knfPC/r7l6CGVYwd5wsRI/MN3mKYI
+      YbTnKVW7VbB2Okf/O0Z4VvZmA4yx97N1UMxnnUuhg85NK/lYPbQ4LrzOuJmKsA6/
+      lroofmd3rzO2PIpktojn1DtssmiCdmcU8AowAJg+Mr5prc5gsaknRH8Ufgw5xgjv
+      iGl874r7/hA0MBY21GMYDkgMIiGh50P0kx/VF9/yHHVDZ3ayrsaQGinIKJPSFlne
+      c1ifgF/wPLyuYz7Svs+EMpNMfdw3klU6JZ4SHlmVJm/xczrBottZL5M16DlR8/ax
+      PS6KadMLLR3ChCWRE0Pj9nIYBswsrA==
+      -----END CERTIFICATE-----
+    marker: "{mark}"
+    marker_begin: "<ca>"
+    marker_end: "</ca>"
+  with_fileglob: '/etc/openvpn/client/*.conf'
+  register: foundfiles
+
+- name: Restart services belonging to changed files
+  ansible.builtin.systemd:
+    enabled: true
+    state: restarted
+    name: "openvpn-client@{{ item.invocation.module_args.path | regex_replace('^/etc/openvpn/client/(.*).conf','\\1') }}"
+  when: item.changed
+  loop: "{{ foundfiles.results }}"
+  loop_control:
+    label: "{{ item.invocation.module_args.path }}"
